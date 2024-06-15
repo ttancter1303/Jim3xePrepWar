@@ -1,5 +1,6 @@
 package jim3xe.web.jim3xeprepwar.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,30 +11,23 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 public class Post {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     private String thumbnail;
-
-    @Column(nullable = false)
     private String title;
-
-    @Column(nullable = false, unique = true)
     private String slug;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String body;
 
-    @Column(nullable = false)
     private String status;
-
-    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @ManyToMany

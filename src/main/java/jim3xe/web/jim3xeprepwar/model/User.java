@@ -1,10 +1,10 @@
 package jim3xe.web.jim3xeprepwar.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -19,11 +19,10 @@ public class User {
     private String password;
     private String name;
     private String avatarImg;
-
-    @Column()
     private String role;
     private LocalDateTime createdAt;
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Post> posts;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<Post> posts;
 }

@@ -14,8 +14,7 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @ManyToMany
-    @JoinTable(name = "post_tag", joinColumns = @JoinColumn(name = "tag_id"), inverseJoinColumns = @JoinColumn(name = "post_id"))
+    @ManyToMany(mappedBy = "listTag")
     private List<Post> posts;
 
     @Column(nullable = false)
