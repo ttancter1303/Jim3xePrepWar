@@ -23,6 +23,5 @@ public class User {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    @JsonManagedReference
     private List<Post> posts;
 }

@@ -20,8 +20,7 @@ public class ConfigSecurity {
         // muốn vào path admin cần có role admin
         httpSecurity.authorizeRequests().requestMatchers("/admin/**").hasRole("ADMIN");
         //tất cả request đều phải đăng nhập
-        httpSecurity.authorizeRequests().anyRequest().authenticated();
-//        httpSecurity.authorizeRequests().anyRequest().authenticated();
+        httpSecurity.authorizeRequests().anyRequest().permitAll();
 
         //set đường link login
         httpSecurity.formLogin().permitAll();

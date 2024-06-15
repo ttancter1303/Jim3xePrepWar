@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,25 +17,34 @@ public class TagService {
     @Autowired
     private TagRepository tagRepository;
 
-    public TagDTO getTagById(int id) {
-        Tag tag = tagRepository.findById(id).orElse(null);
-        if (tag == null) {
-            return null;
-        }
 
-        List<PostIdDTO> postIds = tag.getPosts().stream()
-                .map(post -> new PostIdDTO(post.getId()))
-                .collect(Collectors.toList());
-
-        return new TagDTO(tag.getId(), tag.getName(), tag.getCreatedAt(), postIds);
+    public TagDTO convertToDTO(Tag tag) {
+        TagDTO tagDTO = new TagDTO();
+        tagDTO.setId(tag.getId());
+        tagDTO.setName(tag.getName());
+        tagDTO.setCreatedAt(tag.getCreatedAt());
+        tagDTO.setPostIds(tag.getPosts().stream()
+                .map(post -> post.getId())
+                .collect(Collectors.toList()));
+        return tagDTO;
     }
-    public List<TagDTO> getAllTags() {
+
+    public List<TagDTO> getAllTagDTOs() {
         List<Tag> tags = tagRepository.findAll();
-        return tags.stream().map(tag -> {
-            List<PostIdDTO> postIds = tag.getPosts().stream()
-                    .map(post -> new PostIdDTO(post.getId()))
-                    .collect(Collectors.toList());
-            return new TagDTO(tag.getId(), tag.getName(), tag.getCreatedAt(), postIds);
-        }).collect(Collectors.toList());
+        return tags.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+
+    public TagDTO getTagById(int id) {
+        Optional<Tag> tagOptional = tagRepository.findById(id);
+        if (tagOptional.isPresent()) {
+            Tag tag = tagOptional.get();
+            return convertToDTO(tag);
+        } else {
+            throw new RuntimeException("Tag not found with id: " + id);
+        }
     }
 }

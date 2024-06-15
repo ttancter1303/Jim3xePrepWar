@@ -2,7 +2,7 @@ package jim3xe.web.jim3xeprepwar.service.impl;
 
 import jim3xe.web.jim3xeprepwar.model.User;
 import jim3xe.web.jim3xeprepwar.repository.UserRepository;
-import jim3xe.web.jim3xeprepwar.service.UserService;
+import jim3xe.web.jim3xeprepwar.service.UserLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserServiceImpl implements UserService {
+public class UserLoginServiceImpl implements UserLoginService {
     @Autowired
      private UserRepository userRepository;
 
