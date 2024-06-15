@@ -3,14 +3,21 @@ package jim3xe.web.jim3xeprepwar.service;
 import jim3xe.web.jim3xeprepwar.dto.UserDTO;
 import jim3xe.web.jim3xeprepwar.model.Post;
 import jim3xe.web.jim3xeprepwar.model.User;
+import jim3xe.web.jim3xeprepwar.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
-    // Inject UserRepository và các phương thức khác
+    @Autowired
+    UserRepository userRepository;
 
     public UserDTO convertToDTO(User user) {
         UserDTO userDTO = new UserDTO();
@@ -28,5 +35,22 @@ public class UserService {
 
     public void createToken(){
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findAccountByUsername(username);
+        if (user == null){
+            throw new UsernameNotFoundException(username);
+        }
+        return new CustomUserDetails(user);
+    }
+    @Transactional
+    public CustomUserDetails loadUserById(int id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new UsernameNotFoundException("User not found with id: " + id)
+        );
+
+        return CustomUserDetails.build(user);
     }
 }

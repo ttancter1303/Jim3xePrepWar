@@ -1,30 +1,51 @@
 package jim3xe.web.jim3xeprepwar.config;
 
+import jim3xe.web.jim3xeprepwar.component.JwtAuthenticationFilter;
+import jim3xe.web.jim3xeprepwar.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ConfigSecurity {
-    private String[] arrPath = {"/", "/webjars/**"};
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable();
-// những path này sẽ được qua hết
-        httpSecurity.authorizeRequests().requestMatchers(arrPath).permitAll();
-        httpSecurity.authorizeRequests().requestMatchers("/admin/**").authenticated();
-        // muốn vào path admin cần có role admin
-        httpSecurity.authorizeRequests().requestMatchers("/admin/**").hasRole("ADMIN");
-        //tất cả request đều phải đăng nhập
-        httpSecurity.authorizeRequests().anyRequest().permitAll();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors().and().csrf().disable()
+                .authorizeRequests()
+                .requestMatchers("/api/auth/**").permitAll()
+                .anyRequest().permitAll()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        //set đường link login
-        httpSecurity.formLogin().permitAll();
-        return httpSecurity.build();
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean

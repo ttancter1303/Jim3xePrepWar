@@ -1,33 +1,57 @@
 package jim3xe.web.jim3xeprepwar.service;
+
 import jim3xe.web.jim3xeprepwar.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.util.Collection;
 import java.util.Collections;
 
-@Data
-@AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-    User user;
+    private int id;
+    private String username;
+    private String password;
+    private Collection<? extends GrantedAuthority> authorities;
+
+    public CustomUserDetails(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.authorities = authorities;
+    }
+
+    public CustomUserDetails(User user) {
+    }
+
+    public static CustomUserDetails build(User user) {
+        // Assuming the role is a single string value; you may need to adjust if using multiple roles
+        GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
+        return new CustomUserDetails(
+                user.getId(),
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singletonList(authority)
+        );
+    }
+
+    public int getId() {
+        return id;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        return authorities;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return username;
     }
 
     @Override
@@ -50,4 +74,3 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 }
-
