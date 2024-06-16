@@ -40,10 +40,11 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findAccountByUsername(username);
-        if (user == null){
+        UserDTO userDTO = convertToDTO(user);
+        if (userDTO == null){
             throw new UsernameNotFoundException(username);
         }
-        return new CustomUserDetails(user);
+        return new CustomUserDetails(userDTO);
     }
     @Transactional
     public CustomUserDetails loadUserById(int id) {

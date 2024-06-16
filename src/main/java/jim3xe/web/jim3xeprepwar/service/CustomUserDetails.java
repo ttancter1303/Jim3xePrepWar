@@ -1,5 +1,6 @@
 package jim3xe.web.jim3xeprepwar.service;
 
+import jim3xe.web.jim3xeprepwar.dto.UserDTO;
 import jim3xe.web.jim3xeprepwar.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +14,8 @@ public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
+    private User user;
+    private UserDTO userDTO;
 
     public CustomUserDetails(int id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
@@ -21,9 +24,21 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = authorities;
     }
 
-    public CustomUserDetails(User user) {
+    public CustomUserDetails(UserDTO userDTO) {
+        this.userDTO = userDTO;
     }
 
+    public UserDTO toUserDTO() {
+        return new UserDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getName(),
+                user.getAvatarImg(),
+                user.getRole(),
+                user.getCreatedAt(),
+                user.getPosts()
+        );
+    }
     public static CustomUserDetails build(User user) {
         // Assuming the role is a single string value; you may need to adjust if using multiple roles
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
