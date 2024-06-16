@@ -3,15 +3,13 @@ package jim3xe.web.jim3xeprepwar.controller;
 import jim3xe.web.jim3xeprepwar.dto.TagDTO;
 import jim3xe.web.jim3xeprepwar.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/tags")
+@RequestMapping("/api/tags")
 public class TagController {
 
     @Autowired
@@ -24,8 +22,19 @@ public class TagController {
 
     @GetMapping("/all")
     public List<TagDTO> getAllTags() {
-        return tagService.getAllTagDTOs();
+        return tagService.getAllTags();
     }
-
-    // Các phương thức khác của Controller
+    @PostMapping("/create")
+    public ResponseEntity<TagDTO> createTag(@RequestBody TagDTO tagDTO) {
+        return ResponseEntity.ok(tagService.createTag(tagDTO));
+    }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<TagDTO> updateTag(@PathVariable int id, @RequestBody TagDTO tagDTO) {
+        return ResponseEntity.ok(tagService.updateTag(id, tagDTO));
+    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteTag(@PathVariable int id) {
+        tagService.deleteTag(id);
+        return ResponseEntity.noContent().build();
+    }
 }

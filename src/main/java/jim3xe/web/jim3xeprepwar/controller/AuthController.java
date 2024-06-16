@@ -73,7 +73,6 @@ public class AuthController {
                     .body("Username is already taken!");
         }
 
-        // Creating user's account
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));

@@ -16,5 +16,4 @@ public class PostDTO {
     private int userId; // Chỉ lưu id của User
     private List<Integer> tagIds; // Chỉ lưu id của các Tag
 
-    // Constructor, getters và setters
 }
