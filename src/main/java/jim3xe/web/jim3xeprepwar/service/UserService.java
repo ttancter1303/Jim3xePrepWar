@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,11 +48,15 @@ public class UserService implements UserDetailsService {
         return new CustomUserDetails(userDTO);
     }
     @Transactional
-    public CustomUserDetails loadUserById(int id) {
+    public UserDTO loadUserDTOById(int id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new UsernameNotFoundException("User not found with id: " + id)
         );
-
-        return CustomUserDetails.build(user);
+        return convertToDTO(user);
+    }
+    @Transactional
+    public CustomUserDetails loadUserById(int id) {
+        UserDTO userDTO = loadUserDTOById(id);
+        return new CustomUserDetails(userDTO);
     }
 }

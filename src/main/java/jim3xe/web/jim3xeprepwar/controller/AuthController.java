@@ -9,6 +9,7 @@ import jim3xe.web.jim3xeprepwar.payload.LoginRequest;
 import jim3xe.web.jim3xeprepwar.payload.SignUpRequest;
 import jim3xe.web.jim3xeprepwar.repository.UserRepository;
 import jim3xe.web.jim3xeprepwar.service.CustomUserDetails;
+import jim3xe.web.jim3xeprepwar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +42,9 @@ public class AuthController {
 
     @Autowired
     JwtTokenProvider tokenProvider;
+    @Autowired
+    UserService userService;
+
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -50,15 +56,17 @@ public class AuthController {
                     )
             );
 
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             String jwt = tokenProvider.generateToken(userDetails);
-            UserDTO userDTO = userDetails.toUserDTO();
+
+            UserDTO userDTO = userService.loadUserDTOById(userDetails.getId());
 
             return ResponseEntity.ok(new JwtResponse(jwt, userDTO));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
@@ -78,7 +86,7 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setName(signUpRequest.getName());
         user.setRole("ROLE_USER");
-        user.setCreatedAt(LocalDateTime.from(LocalDate.now()));
+        user.setCreatedAt(LocalDateTime.from(LocalDateTime.now()));
 
         userRepository.save(user);
 
